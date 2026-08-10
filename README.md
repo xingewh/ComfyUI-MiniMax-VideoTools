@@ -40,7 +40,7 @@ Automated Audio Merging: Automatically merges external audio lines into high-com
 
 <p align="center">
 
-&#x20; <img src="workflow.png" alt="ComfyUI MiniMax Workflow Preview" width="100%">
+&#x20; <img src="images/workflow.png" alt="ComfyUI MiniMax Workflow Preview" width="100%">
 
 </p>
 
@@ -48,7 +48,7 @@ Automated Audio Merging: Automatically merges external audio lines into high-com
 
 <p align="center">
 
-&#x20; <img src="load video.png" alt="ComfyUI MiniMax Workflow Preview" width="100%">
+&#x20; <img src="images/load_video.png" alt="ComfyUI MiniMax Workflow Preview" width="100%">
 
 </p>
 
@@ -56,7 +56,7 @@ Automated Audio Merging: Automatically merges external audio lines into high-com
 
 <p align="center">
 
-&#x20; <img src="save video.png" alt="ComfyUI MiniMax Workflow Preview" width="100%">
+&#x20; <img src="images/save_video.png" alt="ComfyUI MiniMax Workflow Preview" width="100%">
 
 </p>
 
