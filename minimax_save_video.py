@@ -1,6 +1,7 @@
 import os
 import subprocess
 import shutil
+import time
 import folder_paths
 import numpy as np
 import imageio
@@ -31,7 +32,7 @@ class MiniMaxSaveVideoFixed:
     CATEGORY = "MiniMax Tools"
 
     def _extract_frames(self, obj, frame_list):
-        """递归提取视频图像帧"""
+        """仅提取视频图像帧"""
         if obj is None:
             return
 
@@ -96,26 +97,33 @@ class MiniMaxSaveVideoFixed:
         if len(frame_list) == 0:
             raise ValueError("MiniMax Save Video: 必须连接 'images' 或 'video' 端口且包含有效帧！")
 
-        # 2. 准备输出文件名与路径
-        first_frame = frame_list[0]
-        h, w = first_frame.shape[0], first_frame.shape[1]
-        full_output_folder, filename, counter, subfolder, filename_prefix = \
-            folder_paths.get_save_image_path(filename_prefix, self.output_dir, w, h)
+        # 2. 准备输出目标文件夹 (指定为 output/video)
+        subfolder = "video"
+        full_output_folder = os.path.join(self.output_dir, subfolder)
+        os.makedirs(full_output_folder, exist_ok=True)
 
-        file_filename = f"{filename}_{counter:05_}.mp4"
-        file_path = os.path.join(full_output_folder, file_filename)
+      # 3. 结合【时间戳 + 3位自增序号】生成简短唯一文件名（格式如：MiniMax_20260810_153022_001.mp4）
+        timestamp = time.strftime("%Y%m%d_%H%M%S")
+        counter = 1
+        while True:
+            file_filename = f"{filename_prefix}_{timestamp}_{counter:03d}.mp4"
+            file_path = os.path.join(full_output_folder, file_filename)
+            if not os.path.exists(file_path):
+                break
+            counter += 1
+
         temp_video_path = os.path.join(full_output_folder, f"temp_{file_filename}")
 
-        # 3. 编码画面视频文件
+        # 4. 编码无声视频
         writer = imageio.get_writer(temp_video_path, fps=fps, codec='libx264', quality=8)
         for frame in frame_list:
             writer.append_data(frame)
         writer.close()
 
-        # 4. 如果连了 audio 端口，使用 FFmpeg 压入音轨
+        # 5. 音频处理（完全采用单位原版 FFmpeg 命令行）
         has_merged_audio = False
         if audio is not None:
-            temp_audio_path = os.path.join(full_output_folder, f"temp_{counter:05_}.wav")
+            temp_audio_path = os.path.join(full_output_folder, f"temp_{counter:05d}.wav")
             if self._save_audio_to_wav(audio, temp_audio_path):
                 ffmpeg_path = shutil.which("ffmpeg")
                 if ffmpeg_path and os.path.exists(temp_audio_path):
@@ -137,7 +145,7 @@ class MiniMaxSaveVideoFixed:
                 if os.path.exists(temp_audio_path):
                     os.remove(temp_audio_path)
 
-        # 5. 清理临时文件
+        # 6. 清理临时无声视频文件
         if not has_merged_audio:
             if os.path.exists(file_path):
                 os.remove(file_path)
@@ -146,6 +154,7 @@ class MiniMaxSaveVideoFixed:
             if os.path.exists(temp_video_path):
                 os.remove(temp_video_path)
 
+        # 7. 返回结果给前端 JS，带上 subfolder="video"，完美触发 UI 播放控件
         return {
             "ui": {
                 "images": [{

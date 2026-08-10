@@ -15,7 +15,7 @@ class MiniMaxLoadVideoFixed:
         return {
             "required": {
                 "视频文件": (sorted(files), {"video_upload": True}),
-                "强制帧率": ("INT", {"default": 24, "min": 0, "max": 120, "step": 1}),
+                "强制帧率": ("INT", {"default": 0, "min": 0, "max": 120, "step": 1}),
                 "帧数读取上限": ("INT", {"default": 0, "min": 0, "max": 10000, "step": 1}),
                 "跳过前X帧": ("INT", {"default": 0, "min": 0, "max": 10000, "step": 1}),
                 "抽帧间隔": ("INT", {"default": 1, "min": 1, "max": 100, "step": 1}),
@@ -27,7 +27,7 @@ class MiniMaxLoadVideoFixed:
     FUNCTION = "load_video"
     CATEGORY = "MiniMax Tools"
 
-    def load_video(self, 视频文件, 强制帧率=24, 帧数读取上限=0, 跳过前X帧=0, 抽帧间隔=1):
+    def load_video(self, 视频文件, 强制帧率=0, 帧数读取上限=0, 跳过前X帧=0, 抽帧间隔=1):
         video_path = folder_paths.get_annotated_filepath(视频文件)
 
         # 1. 提取视频帧
@@ -53,7 +53,7 @@ class MiniMaxLoadVideoFixed:
         images = torch.stack(frames, dim=0)
         frame_count = len(frames)
 
-        # 2. 使用 FFmpeg 提取音频（兼容 AAC / MP3 / WAV）
+        # 2. 使用 FFmpeg 提取音频（全面兼容 AAC / MP3 / WAV）
         audio = self._extract_audio_ffmpeg(video_path)
 
         return (images, frame_count, audio)
@@ -63,6 +63,7 @@ class MiniMaxLoadVideoFixed:
         if not ffmpeg_path:
             return None
 
+        # 创建临时 wav 文件提取音频流
         with tempfile.NamedTemporaryFile(suffix=".wav", delete=False) as temp_wav:
             temp_wav_path = temp_wav.name
 
@@ -70,8 +71,8 @@ class MiniMaxLoadVideoFixed:
             cmd = [
                 ffmpeg_path, "-y",
                 "-i", video_path,
-                "-vn",                    # 忽略视频流
-                "-acodec", "pcm_s16le",  # 导出为 PCM 16bit WAV
+                "-vn",                    # 不要视频
+                "-acodec", "pcm_s16le",  # 强转 PCM 16bit WAV
                 "-ar", "44100",           # 采样率 44.1kHz
                 "-ac", "2",               # 双声道
                 temp_wav_path
@@ -86,7 +87,7 @@ class MiniMaxLoadVideoFixed:
                 if data.ndim == 1:
                     data = np.expand_dims(data, axis=1) # (samples, 1)
                 
-                # 转换为 (channels, samples) 形状并扩展 batch 维
+                # 转换为 (channels, samples)
                 waveform = torch.from_numpy(data.T).unsqueeze(0) # (1, channels, samples)
                 
                 return {
