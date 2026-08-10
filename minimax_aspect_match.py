@@ -31,11 +31,12 @@ class MiniMaxAspectMatch:
     RETURN_TYPES = ("INT", "INT", "STRING", "FLOAT", "IMAGE")
     RETURN_NAMES = ("width", "height", "ratio_str", "aspect_ratio", "cropped_image")
     FUNCTION = "calculate_resolution"
-    CATEGORY = "MiniMax Tools"
+    CATEGORY = "facetools"
 
     def calculate_resolution(self, aspect_ratio, megapixels, multiple, auto_detect_image, image=None):
         target_ratio_val = None
 
+        # 1. 判断长宽比
         if auto_detect_image and image is not None:
             _, h, w, _ = image.shape
             img_ratio = w / float(h)
@@ -51,7 +52,7 @@ class MiniMaxAspectMatch:
             rw, rh = self.ASPECT_RATIOS[aspect_ratio]
             target_ratio_val = rw / rh
 
-        # 低/目标分辨率计算（受 megapixels 影响）
+        # 2. 视频生成的低/目标分辨率计算（受 megapixels 影响）
         total_pixels = megapixels * 1024 * 1024
         raw_w = math.sqrt(total_pixels * target_ratio_val)
         raw_h = raw_w / target_ratio_val
@@ -59,12 +60,13 @@ class MiniMaxAspectMatch:
         final_w = int(round(raw_w / multiple) * multiple)
         final_h = int(round(raw_h / multiple) * multiple)
 
-        # 参考图仅做 Center Crop，保留原始高清像素（按 multiple 整除边缘）
+        # 3. 参考图处理：只做长宽比 Crop，保留原图高清分辨率（仅做整除对齐）
         out_image = None
         if image is not None:
             batch, orig_h, orig_w, channels = image.shape
             orig_ratio = orig_w / float(orig_h)
 
+            # 计算最大居中裁剪区域
             if orig_ratio > target_ratio_val:
                 crop_h = orig_h
                 crop_w = int(round(orig_h * target_ratio_val))
@@ -77,6 +79,7 @@ class MiniMaxAspectMatch:
 
             cropped = image[:, start_y:start_y + crop_h, start_x:start_x + crop_w, :]
 
+            # 微调裁剪后的图片尺寸，使其宽度和高度严格能被 multiple 整除（不改变清晰度，仅裁掉边缘 1-2 像素）
             high_res_w = (crop_w // multiple) * multiple
             high_res_h = (crop_h // multiple) * multiple
 
