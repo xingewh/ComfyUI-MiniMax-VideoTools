@@ -38,6 +38,28 @@ Automated Audio Merging: Automatically merges external audio lines into high-com
 
 
 
+<p align="center">
+
+&#x20; <img src="workflow.png" alt="ComfyUI MiniMax Workflow Preview" width="100%">
+
+</p>
+
+
+
+<p align="center">
+
+&#x20; <img src="load video.png" alt="ComfyUI MiniMax Workflow Preview" width="100%">
+
+</p>
+
+
+
+<p align="center">
+
+&#x20; <img src="save video.png" alt="ComfyUI MiniMax Workflow Preview" width="100%">
+
+</p>
+
 
 
 
@@ -77,10 +99,4 @@ Automated Audio Merging: Automatically merges external audio lines into high-com
 
 
 音视频自动合成：若连接了音频线，将自动通过 FFmpeg 压制合成带音轨的 H.264 MP4 视频。
-
-
-
-
-
-
 
