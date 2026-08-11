@@ -34,6 +34,28 @@ To solve this issue, this node package was developed with the assistance of Gemi
 <p align="center">
   <img src="images/Aspect Ratio Matcher.png" alt="ComfyUI MiniMax Workflow Preview" width="100%">
 </p>
+---
+
+
+```markdown
+## ❓ Frequently Asked Questions (FAQ)
+
+### 1. Video generates fine but has no audio, or throws `exit status 3221225781`?
+* **Cause**: FFmpeg is either missing from your system or is a dynamic build missing its required `.dll` dependencies.
+* **Solution**:
+  1. Go to [Gyan.dev FFmpeg Releases](https://github.com/GyanD/codexffmpeg/releases) and download `ffmpeg-x.x.x-essentials_build.zip` (**Do NOT select the `shared` version**).
+  2. Extract the archive and copy the standalone `ffmpeg.exe` (approx. 100MB+) from the `bin` folder directly into your root ComfyUI directory (e.g., `ComfyUI/`).
+  3. Fully restart ComfyUI and rerun your workflow.
+
+### 2. Getting `[WinError 121] The semaphore timeout period has expired` on startup?
+* **Cause**: Network connection issues reaching GitHub servers directly to pull node or manager listings.
+* **Solution**:
+  Open `ComfyUI/custom_nodes/ComfyUI-Manager/config.ini` and set `channel_url` to a mirror endpoint:
+  ```ini
+  [default]
+  channel_url = [https://gitee.com/ltdrdata/ComfyUI-Manager/raw/main](https://gitee.com/ltdrdata/ComfyUI-Manager/raw/main)
+
+
 
 ---
 
@@ -53,7 +75,24 @@ To solve this issue, this node package was developed with the assistance of Gemi
 * **音视频自动合成**：若连接了音频线，将自动通过 FFmpeg 压制合成带音轨的 H.264 MP4 视频。[cite: 8]
 
 #### 3. MiniMax Aspect Ratio Matcher | 宽高比自动适配节点
-* **自动比例检测**：开启 `auto_detect_image` 后，自动匹配最贴近的标准宽高比（如 16:9, 9:16, 1:1 等）[cite: 3]。
+* **自动比例检测**：开启 `auto_detect_image` 后，自动匹配与输入图像最贴近的标准宽高比（如 16:9, 9:16, 1:1 等）[cite: 3]。
 * **32倍整除对齐**：默认 `multiple=32`，确保输出尺寸严格符合底层 VAE 的整除要求，避免图像拉伸或报错[cite: 3]。
 * **百万像素控帧**：支持通过 `megapixels` 动态计算目标生成分辨率[cite: 3]。
 * **无损中心裁剪**：输出 `cropped_image` 进行保持画质的 Center Crop，完美对齐目标比例[cite: 3]。
+
+## ❓ 常见问题与排查 (FAQ)
+
+### 1. 视频生成正常但无声音，或报错 `exit status 3221225781`？
+* **原因**：系统缺少 FFmpeg，或使用的 FFmpeg 属于动态编译版本（缺少关联的 `.dll` 依赖库）。
+* **解决方法**：
+  1. 前往 [Gyan.dev FFmpeg Releases](https://github.com/GyanD/codexffmpeg/releases) 下载 `ffmpeg-x.x.x-essentials_build.zip`（**请勿选择带 `shared` 字样的版本**）。
+  2. 解压后将 `bin` 文件夹内的静态单文件 `ffmpeg.exe`（文件大小约 100MB+）复制到你的 ComfyUI 根目录下（例如 `D:\ComfyUI\`）。
+  3. 彻底重启 ComfyUI 后重新运行工作流即可。
+
+### 2. 启动时报 `[WinError 121] 信号灯超时时间已到`？
+* **原因**：国内网络无法正常直连 GitHub 请求 Manager 或节点的索引列表。
+* **解决方法**：
+  打开 `ComfyUI/custom_nodes/ComfyUI-Manager/config.ini`，将 `channel_url` 修改为镜像源：
+  ```ini
+  [default]
+  channel_url = [https://gitee.com/ltdrdata/ComfyUI-Manager/raw/main](https://gitee.com/ltdrdata/ComfyUI-Manager/raw/main)
