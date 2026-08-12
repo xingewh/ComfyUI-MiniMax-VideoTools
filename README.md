@@ -19,6 +19,14 @@ To solve this issue, this node package was developed with the assistance of Gemi
 * **Megapixel Scaling**: Dynamic resolution computation driven by customizable `megapixels` settings[cite: 3].
 * **High-Res Center Crop**: Outputs `cropped_image` via Center Crop without downscaling, preserving edge sharpness while matching target ratios[cite: 3].
 
+### 4.⚡ Preview Node Direct Execution
+
+To streamline your workflow debugging experience, this plugin adds lightweight, seamless direct execution support for standard preview nodes:
+
+* **Header Quick-Action Button**: Adds an elegant `▶` execute button directly in the **top-right titlebar** of `PreviewImage` and `SaveImage` nodes. Clicking it instantly triggers partial execution for the selected node and its upstream dependencies without re-running the entire workflow.
+* **Shortcut Trigger**: Hold **`Ctrl` + Double Click** anywhere on the node to execute immediately.
+* **Native Progress Visuals**: Fully integrated with `rgthree-comfy` internal scheduling, preserving real-time execution progress indicators and status feedback without taking up extra canvas space.
+
 <p align="center">
   <img src="images/workflow.png" alt="ComfyUI MiniMax Workflow Preview" width="100%">
 </p>
@@ -36,8 +44,13 @@ To solve this issue, this node package was developed with the assistance of Gemi
 </p>
 ---
 
+<p align="center">
+  <img src="images/Preview_Node_Direct_Execution.png" alt="ComfyUI MiniMax Workflow Preview" width="100%">
+</p>
+---
 
-```markdown
+
+
 ## ❓ Frequently Asked Questions (FAQ)
 
 ### 1. Video generates fine but has no audio, or throws `exit status 3221225781`?
@@ -79,6 +92,14 @@ To solve this issue, this node package was developed with the assistance of Gemi
 * **32倍整除对齐**：默认 `multiple=32`，确保输出尺寸严格符合底层 VAE 的整除要求，避免图像拉伸或报错[cite: 3]。
 * **百万像素控帧**：支持通过 `megapixels` 动态计算目标生成分辨率[cite: 3]。
 * **无损中心裁剪**：输出 `cropped_image` 进行保持画质的 Center Crop，完美对齐目标比例[cite: 3]。
+
+### 4.⚡ 预览节点一键执行 (Preview Node Direct Execution)
+
+为了提升调试工作流时的效率，本插件为原生预览节点扩展了极其便捷的单节点/局部执行功能：
+
+* **标题栏快捷按钮**：在 `PreviewImage`（预览图像）与 `SaveImage`（保存图像）节点的**右上角标题栏**中，直接集成了一个精致的 `▶` 执行按钮。点击即可仅运行当前节点及其上游依赖链路，无需重新跑整个工作流。
+* **快捷键触发**：支持按住 **`Ctrl` + 鼠标左键双击** 节点任意位置快速触发执行。
+* **带进度原生体验**：深度联动 `rgthree-comfy` 内部调度机制，完美保留执行进度条与动态反馈，轻量高效且不占节点空间。
 
 ## ❓ 常见问题与排查 (FAQ)
 
