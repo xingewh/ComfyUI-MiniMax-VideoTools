@@ -30,12 +30,17 @@ app.registerExtension({
         if (node.comfyClass === "PreviewImage" || node.comfyClass === "SaveImage") {
             
             // -------------------------------------------------------------
-            // 1. 在标题栏（Header）最右上角精准绘制 ▶
+            // 1. 在标题栏（Header）最右上角绘制 ▶（折叠时隐藏）
             // -------------------------------------------------------------
             const origOnDrawForeground = node.onDrawForeground;
             node.onDrawForeground = function(ctx) {
                 if (origOnDrawForeground) {
                     origOnDrawForeground.apply(this, arguments);
+                }
+
+                // 如果节点处于折叠状态，不绘制图标
+                if (this.flags?.collapsed) {
+                    return;
                 }
 
                 ctx.save();
@@ -44,10 +49,9 @@ app.registerExtension({
                 ctx.textBaseline = "middle";
 
                 const titleHeight = LiteGraph.NODE_TITLE_HEIGHT || 30;
-                const renderX = this.size[0] - 10;        // 距离标题栏右边缘 10px
-                const renderY = -(titleHeight / 2);       // 负坐标：精确定位到标题栏垂直居中处
+                const renderX = this.size[0] - 10;
+                const renderY = -(titleHeight / 2);
 
-                // 悬停变亮绿，平时为半透明亮灰
                 ctx.fillStyle = this._is_mouse_over_exec ? "#00FF88" : "rgba(255, 255, 255, 0.75)";
                 ctx.fillText("▶", renderX, renderY);
 
@@ -55,20 +59,22 @@ app.registerExtension({
             };
 
             // -------------------------------------------------------------
-            // 2. 判定标题栏右上角的点击区域
+            // 2. 判定标题栏右上角的点击区域（折叠时不响应）
             // -------------------------------------------------------------
             const origOnMouseDown = node.onMouseDown;
             node.onMouseDown = function(e, localPos, canvas) {
-                const titleHeight = LiteGraph.NODE_TITLE_HEIGHT || 30;
-                const renderX = this.size[0] - 10;
+                // 如果节点已折叠，忽略标题栏的特化点击
+                if (!this.flags?.collapsed) {
+                    const titleHeight = LiteGraph.NODE_TITLE_HEIGHT || 30;
+                    const renderX = this.size[0] - 10;
 
-                // localPos[1] 在负区间代表点击了标题栏
-                const isInTitlebarY = localPos[1] >= -titleHeight && localPos[1] <= 0;
-                const isInTitlebarX = localPos[0] >= renderX - 20 && localPos[0] <= this.size[0];
+                    const isInTitlebarY = localPos[1] >= -titleHeight && localPos[1] <= 0;
+                    const isInTitlebarX = localPos[0] >= renderX - 20 && localPos[0] <= this.size[0];
 
-                if (isInTitlebarY && isInTitlebarX) {
-                    triggerRgthreeRightClickExec(this);
-                    return true; // 拦截点击事件，防止误触发节点拖拽
+                    if (isInTitlebarY && isInTitlebarX) {
+                        triggerRgthreeRightClickExec(this);
+                        return true;
+                    }
                 }
 
                 if (origOnMouseDown) {
@@ -81,6 +87,10 @@ app.registerExtension({
             node.onMouseMove = function(e, localPos, canvas) {
                 if (origOnMouseMove) {
                     origOnMouseMove.apply(this, arguments);
+                }
+
+                if (this.flags?.collapsed) {
+                    return;
                 }
 
                 const titleHeight = LiteGraph.NODE_TITLE_HEIGHT || 30;
